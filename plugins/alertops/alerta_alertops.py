@@ -15,8 +15,6 @@ from alerta.plugins import PluginBase
 LOG = logging.getLogger('alerta.plugins')
 
 ALERTOPS_URL = os.environ.get('ALERTOPS_URL') or app.config['ALERTOPS_URL']
-DASHBOARD_URL = os.environ.get('DASHBOARD_URL') or app.config['DASHBOARD_URL']
-
 
 class TriggerEvent(PluginBase):
 
@@ -42,8 +40,7 @@ class TriggerEvent(PluginBase):
             "source_status": TriggerEvent._event_type(alert.severity),
             "description": message,
             "resource": alert.resource,
-            "source": "alerta",
-            "source_url": '%s/#/alert/%s' % (DASHBOARD_URL, alert.id),
+            "source": "alerta",            
             "details": alert.get_body(history=False)}
         LOG.debug('AlertOps Payload: %s', payload)
 
@@ -64,8 +61,7 @@ class TriggerEvent(PluginBase):
             "source_status": TriggerEvent._event_type(alert.severity),
             "description": message,
             "resource": alert.resource,
-            "source": "alerta",
-            "source_url": '%s/#/alert/%s' % (DASHBOARD_URL, alert.id),
+            "source": "alerta",            
             "details": alert.get_body(history=False)}
 
         try:

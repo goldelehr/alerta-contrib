@@ -1,6 +1,5 @@
 import os
 import logging
-import requests
 
 from alerta.plugins import PluginBase
 from alertaclient.api import Client

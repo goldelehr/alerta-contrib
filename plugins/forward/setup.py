@@ -16,7 +16,8 @@ setup(
     include_package_data=True,
     zip_safe=True,
     install_requires=[
-        'alerta'
+        'alerta',
+        'requests'
     ],
     entry_points={
         'alerta.plugins': [

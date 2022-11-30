@@ -1,5 +1,6 @@
 import os
 import logging
+import requests
 
 from alerta.plugins import PluginBase
 from alertaclient.api import Client
@@ -26,17 +27,20 @@ class ForwardAlert(PluginBase):
     def post_receive(self, alert):
         if not FORWARD_URL or not FORWARD_API_KEY:
             return
-        client = Client(endpoint=FORWARD_URL, key=FORWARD_API_KEY)
-        fw_count = alert.attributes.get('fw_count') or 0
-        fw_count = fw_count+1
-        if fw_count >= FORWARD_MAX_LENGTH:
-            LOG.debug('alert discarded by cycle overflow')
-            return
 
-        alert.attributes['fw_count'] = fw_count
-        client.send_alert(
-            **alert.serialize
-        )
+        message = "%s: %s alert for %s - %s" %( alert.environment, alert.severity.capitalize(), ','.join(alert.service), alert.resource)
+        payload = {
+            "source_id": alert.id,            
+            "description": message,
+            "resource": alert.resource,
+            "source": "alerta"
+        }    
+
+        try:
+            r = requests.post(FORWARD_URL, json=payload, timeout=2)
+        except Exception as e:
+            raise RuntimeError("AlertOps connection error: %s" % e)
+        LOG.debug('AlertOps response: %s - %s' % (r.status_code, r.text))
         return
 
     def status_change(self, alert, status, text):
